@@ -1,13 +1,13 @@
-###Antilibrary worker
+### Antilibrary worker
 
 
-####About
+#### About
 
 Use this worker to donate harddrive space to storing books for the [Antilibrary](https://www.reddit.com/r/antilibrary/comments/6ow6tq/antilibrary_faq/) project. 
 
 The files are stored on IPFS so the download badnwidth is shared among the peers.
 
-####Install
+#### Install
 
 - [Download and install IPFS](https://ipfs.io/docs/install/)
 - Download and install ruby (>2.3)) ([windows](https://rubyinstaller.org/) / [linux - mac](https://www.ruby-lang.org/en/documentation/installation/))
