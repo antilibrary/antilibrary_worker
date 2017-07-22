@@ -11,7 +11,7 @@ The files are stored on IPFS so the download badnwidth is shared among the peers
 
 - [Download and install IPFS](https://ipfs.io/docs/install/)
 - Download and install ruby (>2.3)) ([windows](https://rubyinstaller.org/) / [linux - mac](https://www.ruby-lang.org/en/documentation/installation/))
-- Copy and paste the content of [antilibrary_worker.rb](#) to a file in your machine
+- Copy and paste the content of [antilibrary_worker.rb](https://raw.githubusercontent.com/antilibrary/antilibrary_worker/master/antilibrary_worker.rb) to a file in your machine
 - Open the file `antilibrary_worker.rb` with a text editor and set the variable `IPFS_BIN_PATH` to the IPFS binary file.
 
 ```
