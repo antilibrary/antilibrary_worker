@@ -1,0 +1,16 @@
+# Total size (in GB) your ipfs repository can use
+storage_limit: 100
+
+# Pick any nickname for your node (you must let me know what nickname you pick)
+nickname: my_node_1
+
+# Secret keyword. This is used as a temporary hack for the ipfs pubsub lack of
+# authentication (you must let me know what secret keyword you pick)
+secret_keyword: MyVerYSecreTkeyWORD
+
+# IPFS binary path - DON'T CHANGE THIS IF YOU'RE USING THE VAGRANT BOX
+# Set ipfs_bin_path with the full path to your ipfs bin file (it cannot be a relative path)
+# Windows example: 
+# ipfs_bin_path = 'C:/go-ipfs/ipfs.exe'
+# Linux example (default if you're using the vagrant box):
+ipfs_bin_path: '/home/vagrant/go-ipfs/ipfs'
