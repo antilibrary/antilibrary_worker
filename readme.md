@@ -1,13 +1,13 @@
-### Antilibrary worker
+## Antilibrary worker
 
 
-#### About
+### About
 
 Use this worker to donate harddrive space to storing books for the [Antilibrary](https://www.reddit.com/r/antilibrary/comments/6ow6tq/antilibrary_faq/) project. 
 
 The files are stored on IPFS so the download bandwidth is shared among the peers.
 
-#### Is this secure?
+### Is this secure?
 
 Yes. The script will run inside an isolated virtual machine and it has no access to your computer.
 
@@ -15,7 +15,7 @@ If you're using a VPN, your ip will be hidden from the IPFS network.
 
 By running the script inside the isolated VM and hiding your ip from the IPFS network, you will be as safe as I am (famous last words :) )
 
-####Run with Vagrant (recommended)
+### Run with Vagrant (recommended)
 
 - [Download and install Vagrant](https://www.vagrantup.com/downloads.html)
 - [Download this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip) and unzip on your computer
@@ -38,7 +38,7 @@ By running the script inside the isolated VM and hiding your ip from the IPFS ne
 - Please note that if you remove your vagrant box with `vagrant destroy` you will remove all books you have stored.
 - If you need to update the config.yml file, make sure to run `vagrant provision` to insert the new file into the vagrant box.
 
-#### Run with ruby
+### Run with ruby
 
 - [Download and install IPFS](https://ipfs.io/docs/install/) (>=0.4.10)
 - Download and install ruby (>=2.0)) ([windows](https://rubyinstaller.org/) / [linux - mac](https://www.ruby-lang.org/en/documentation/installation/))
