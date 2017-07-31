@@ -17,7 +17,7 @@ By running the script inside the isolated VM and hiding your ip from the IPFS ne
 
 ### Run with Vagrant (recommended)
 
-- [Download and install Vagrant](https://www.vagrantup.com/downloads.html)
+- [Download and install Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - [Download this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip) and unzip on your computer
 - Edit the file `config.yml` and set your node space, nickname and secret keyword.
 - Open your console and run `vagrant up` inside the unzipped directory. This will run the worker inside the vagrant machine.
@@ -42,23 +42,9 @@ By running the script inside the isolated VM and hiding your ip from the IPFS ne
 
 - [Download and install IPFS](https://ipfs.io/docs/install/) (>=0.4.10)
 - Download and install ruby (>=2.0)) ([windows](https://rubyinstaller.org/) / [linux - mac](https://www.ruby-lang.org/en/documentation/installation/))
-- Copy and paste the content of [antilibrary_worker.rb](https://raw.githubusercontent.com/antilibrary/antilibrary_worker/master/antilibrary_worker.rb) to a file in your machine
-- Open the file `antilibrary_worker.rb` with a text editor and set the variable `IPFS_BIN_PATH` to the IPFS binary file.
-
-```
-# Set IPFS_BIN_PATH with the full path to your ipfs bin file (it cannot be a relative path)
-# Windows example: 
-# IPFS_BIN_PATH = 'C:/go-ipfs/ipfs.exe'
-# Linux example:
-IPFS_BIN_PATH = './ipfs'
-```
-
-- Run the script with `ruby antilibrary_worker.rb -h` to see how to define your settings. Example run:
-
-```
-ruby al_worker.rb --storage-limit=1000GB --nickname=i_seed_books --secret_keyword=MyVerYSecreTkeyWORD
-```
-
+- [Download this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip) and unzip on your computer
+- Edit the file `config.yml` and set your node space, nickname and secret keyword.
+- Run the script with `ruby antilibrary_worker.rb`
 - Once you run it with your chosen settings you should see something like this:
 
 ```
