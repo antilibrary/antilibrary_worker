@@ -24,13 +24,12 @@ By running the script inside the isolated VM and hiding your ip from the IPFS ne
 - Open a console (cmd on windows), browse to your IPFS folder and run:
 
 ```
-ipfs init                                    # this is required to run the next command
-ipfs daemon --enable-pubsub-experiment       # this is the p2p messages listener used by antilibrary from within the VM
+ipfs init                                # this is required to run the next command
+ipfs daemon --enable-pubsub-experiment   # this is the p2p messages listener used by antilibrary from within the VM
 ```
 
 - Make sure you get a `Daemon is ready` message from the last command. The ipfs daemon must be running for the antilibrary worker to be able to communicate with the tracker.
-- Open another console, browse to the antilibrary_worker folder and run `vagrant up`
-- This will run the worker inside the vagrant machine
+- Open another console, browse to the antilibrary_worker folder and run `vagrant up`. This will run the worker inside the vagrant machine
 - Once everything is finished you should see something like:
 
 ```
@@ -42,6 +41,8 @@ ipfs daemon --enable-pubsub-experiment       # this is the p2p messages listener
 ==> default:   Node nickname: [YOUR_NODE_NICKNAME]
 ==> default:   Node ID: QmTwW5PyA8VaUY4cmjvcLqWTa8y3JPiuErKVoHPjBMRB4s
 ==> default:   Secret keyword: [SECRET_KEYWORD_YOU_DEFINED]
+==> default:
+==> default: Listening on: QmTwW5PyA8VaUY4cmjvcLqWTa8y3JPiuErKVoHPjBMRB4ssecretkeyword (keep this secret)
 ```
 
 - This means your node is listening, now you need to send me your `Node nickname`, `Node ID` and `Secret keyword` so I can whitelist it on the tracker. Send this to [/u/antilibrary](https://www.reddit.com/user/antilibrary/) or antilibrary@protonmail.com
@@ -54,7 +55,7 @@ ipfs daemon --enable-pubsub-experiment       # this is the p2p messages listener
 - The ipfs daemon running on your machine (outside the vagrant box) is required just to receive and send the messages between the tracker and the worker
 
 
-###FAQ
+### FAQ
 
 
 **How much bandwidth will this use?**
