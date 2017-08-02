@@ -12,7 +12,7 @@ require 'fileutils'
 require 'optparse'
 require 'yaml'
 
-VERSION = '0.2'
+VERSION = '0.3'
 TRACKER_ID = 'QmfYZKUBCrHhLfE5mrG48hQ2wHGSNKzRfS4QoaCFhbWYCf'
 
 def create_config
@@ -53,6 +53,23 @@ if @config['nickname'] == 'my_node_1' or @config['secret_keyword'] == 'MyVerYSec
   create_config
 end
 
+def unhandled_exception(message)
+  warn "##################################"
+  warn "Something unexpected happened! Please send me a message with this error message."
+  warn "ERROR MESSAGE: #{message}"
+  warn "##################################"
+  abort
+end
+
+def restart_local_daemon
+  warn " "
+  warn "Connection with the IPFS daemon lost. Restarting daemon..."
+  stdout, stdeerr, status = Open3.capture3("nohup #{@config['ipfs_bin_path']} daemon &")
+  if !status.success?
+    unhandled_exception(stdeerr)
+  end
+end
+
 #check if ipfs bin exists
 if !File.exist?(@config['ipfs_bin_path'])
   warn "Error - IPFS binary not found!"
@@ -65,7 +82,7 @@ if !File.exist?(@config['ipfs_bin_path'])
 end
 
 # check if daemon is running with pubsub enabled 
-stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} pubsub pub test test")
+stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{ENV['ipfs_api_addr']}/tcp/5001 pubsub pub test test")
 if !status.success?
   warn "Error - IPFS pubsub not enabled"
   if stdeerr.include?("Error: experimental pubsub feature not enabled.")
@@ -95,7 +112,7 @@ SECRET_KEYWORD = @config['secret_keyword']
 
 
 # get worker ipfs id
-stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} id")
+stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{ENV['ipfs_api_addr']}/tcp/5001 id")
 if !status.success?
   unhandled_exception(stdeerr)
 end
@@ -108,21 +125,21 @@ puts "  Node ID: #{@worker_id}"
 puts "  Secret keyword: #{SECRET_KEYWORD}"
 puts
 
+puts "Listening on: #{@worker_id}#{SECRET_KEYWORD} (keep this secret)"
+
 # get space currently used
 print "Getting local ipfs repo stat (this may take a while)..."
 stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} repo stat")
 if !status.success?
-  unhandled_exception(stdeerr)
+  restart_local_daemon
 else
   @local_space_used = stdout.split(/\n/)[1].split(' ').last.strip.to_i
 end
 puts "[DONE]"
 
-puts "Listening on: #{@worker_id}#{SECRET_KEYWORD} (keep this secret)"
-
 def listener
   send_joining
-  uri = URI(URI.encode("http://localhost:5001/api/v0/pubsub/sub?arg=#{@worker_id}#{SECRET_KEYWORD}"))
+  uri = URI(URI.encode("http://#{ENV['ipfs_api_addr']}:5001/api/v0/pubsub/sub?arg=#{@worker_id}#{SECRET_KEYWORD}"))
   Net::HTTP.start(uri.host, uri.port) do |http|
     @http = http
     @http.read_timeout = 120
@@ -229,23 +246,14 @@ def send_joining
   puts "[DONE]"
 end
 
-def unhandled_exception(message)
-  warn "##################################"
-  warn "Something unexpected happened! Please send me a message with this error message."
-  warn "ERROR MESSAGE: #{message}"
-  warn "##################################"
-  abort
-end
-
 def message_tracker(message)
   message_json = JSON.generate(message)
-  uri = URI(URI.encode("http://localhost:5001/api/v0/pubsub/pub?arg=#{TRACKER_ID}&arg=#{message_json}"))
+  uri = URI(URI.encode("http://#{ENV['ipfs_api_addr']}:5001/api/v0/pubsub/pub?arg=#{TRACKER_ID}&arg=#{message_json}"))
   Net::HTTP.start(uri.host, uri.port) do |http|
     request = Net::HTTP::Get.new uri
     http.request request
   end
 end
-
 
 def execute_ipfs_command(command, verbose=true)
   print "running: ipfs #{command.split(' ')[0, 2].join(' ')} > " if verbose
@@ -266,6 +274,20 @@ loop {
   begin
     listener
   rescue => e
+
+    if e.to_s.include?('Failed to open TCP connection to localhost:5001')
+      restart_local_daemon
+
+    elsif e.to_s.include?("Failed to open TCP connection to #{ENV['ipfs_api_addr']}:5001")
+      warn " "
+      warn "#################################################"
+      warn "ERROR - IPFS Daemon is not running in the host machine"
+      warn "Please run: 'ipfs daemon --enable-pubsub-experiment' in your computer (not inside the vagrant box)"
+      warn "Once you have the daemon running, rerun the worker with: 'vagrant provision'"
+      warn " "
+      exit
+    end
+
     puts "#{e} >> Restarting... (timeouts are expected - anything else is not)"
   end
 }

@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "config.yml", destination: "config.yml"
   config.vm.provision "file", source: "antilibrary_worker.rb", destination: "antilibrary_worker.rb"
   config.vm.provision "shell", inline: <<-SHELL
-    # install ipfs if not already instealled
+    # install ipfs
     if [ ! -d /home/vagrant/go-ipfs ]; then wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz &&  tar xzvf go-ipfs_v0.4.10_linux-amd64.tar.gz && rm go-ipfs_v0.4.10_linux-amd64.tar.gz; fi
 
     # install ruby
@@ -15,8 +15,16 @@ Vagrant.configure("2") do |config|
 
     # start ipfs
     /home/vagrant/go-ipfs/ipfs init
-    nohup /home/vagrant/go-ipfs/ipfs daemon --enable-pubsub-experiment &
+
+    # replace max ipfs storage with user defined value
+    sed -i "s/10GB/$(grep 'storage_limit:' config.yml | tail -n1 | awk '{ print $2}')GB/g" ~/.ipfs/config
+
+    # run guest daemon
+    nohup /home/vagrant/go-ipfs/ipfs daemon &
     sleep 10
+
+    # get host ipfs daemon ip
+    export ipfs_api_addr=$(netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10)
 
     # start antilibrary worker
     echo ' '

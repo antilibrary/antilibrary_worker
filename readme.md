@@ -5,22 +5,32 @@
 
 Use this worker to donate harddrive space to storing books for the [Antilibrary](https://www.reddit.com/r/antilibrary/comments/6ow6tq/antilibrary_faq/) project. 
 
-The files are stored on IPFS so the download bandwidth is shared among the peers.
+The files are stored on the [IPFS](https://ipfs.io/) network so the download bandwidth is shared among the peers.
 
 ### Is this secure?
 
-Yes. The script will run inside an isolated virtual machine and it has no access to your computer.
+Yes. The antilibrary worker will run inside an isolated virtual machine and it has no access to your computer.
 
 If you're using a VPN, your ip will be hidden from the IPFS network.
 
 By running the script inside the isolated VM and hiding your ip from the IPFS network, you will be as safe as I am (famous last words :) )
 
-### Run with Vagrant (recommended)
+### Install and Run
 
 - [Download and install Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-- [Download this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip) and unzip on your computer
-- Edit the file `config.yml` and set your node space, nickname and secret keyword.
-- Open your console and run `vagrant up` inside the unzipped directory. This will run the worker inside the vagrant machine.
+- [Download and unzip IPFS](https://ipfs.io/docs/install/) (>=0.4.10)
+- [Download and unzip this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip)
+- Browse to the antilibrary_worker folder and edit the file `config.yml` to set your node space, nickname and secret keyword
+- Open a console (cmd on windows), browse to your IPFS folder and run:
+
+```
+ipfs init                                    # this is required to run the next command
+ipfs daemon --enable-pubsub-experiment       # this is the p2p messages listener used by antilibrary from within the VM
+```
+
+- Make sure you get a `Daemon is ready` message from the last command. The ipfs daemon must be running for the antilibrary worker to be able to communicate with the tracker.
+- Open another console, browse to the antilibrary_worker folder and run `vagrant up`
+- This will run the worker inside the vagrant machine
 - Once everything is finished you should see something like:
 
 ```
@@ -35,26 +45,24 @@ By running the script inside the isolated VM and hiding your ip from the IPFS ne
 ```
 
 - This means your node is listening, now you need to send me your `Node nickname`, `Node ID` and `Secret keyword` so I can whitelist it on the tracker. Send this to [/u/antilibrary](https://www.reddit.com/user/antilibrary/) or antilibrary@protonmail.com
-- Please note that if you remove your vagrant box with `vagrant destroy` you will remove all books you have stored.
-- If you need to update the config.yml file, make sure to run `vagrant provision` to insert the new file into the vagrant box.
 
-### Run with ruby
 
-- [Download and install IPFS](https://ipfs.io/docs/install/) (>=0.4.10)
-- Download and install ruby (>=2.0)) ([windows](https://rubyinstaller.org/) / [linux - mac](https://www.ruby-lang.org/en/documentation/installation/))
-- [Download this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip) and unzip on your computer
-- Edit the file `config.yml` and set your node space, nickname and secret keyword.
-- Run the script with `ruby antilibrary_worker.rb`
-- Once you run it with your chosen settings you should see something like this:
+### Important notes
 
-```
-Starting node with the following settings (Make sure you've sent me this information - /u/antilibrary):
-  Node nickname: my_node_1
-  Node ID: QmSaUU735BcyNJ3aJpmSBDtYfAy1DYxjA4LacHh3uCjXtL
-  Secret keyword: not_so_secret
+- If you remove your vagrant box with `vagrant destroy` you will remove all books you have stored
+- If you need to update the config.yml file, make sure to run `vagrant provision` to insert the new file into the vagrant box
+- The ipfs daemon running on your machine (outside the vagrant box) is required just to receive and send the messages between the tracker and the worker
 
-Getting local ipfs repo stat (this may take a while)...[DONE]
-Sending handshake message to tracker...[DONE]
-```
 
-- Now you need to send me your `Node nickname`, `Node ID` and `Secret keyword` so I can whitelist it on the tracker. Send this to [/u/antilibrary](https://www.reddit.com/user/antilibrary/) or antilibrary@protonmail.com
+###FAQ
+
+
+**How much bandwidth will this use?**
+
+You should expect no more than 10GB per TB per month of books stored. So if you're donating 2TB you can expect a bandwidth usage of 20GB per month.
+
+With that said, I must note that it is not possible to predict this with certainty. If someone decides to download the whole library you can expect that your node will have a higher bandwidth usage. Every file is stored in at least in 3 nodes to avoid excessive bandwidth usage from any single node.
+
+**If I don't to contribute anymore, can I just delete everything and I'm good?**
+
+While you could to that, the network will suffer if you do. Please let me know some time before if you are intending to stop seeding, this way I can spread the files you are sharing to other nodes before you leave.
