@@ -1,3 +1,4 @@
+#!/bin/bash
 # install ipfs
 if [[ ! -f "/usr/bin/ipfs" ]]; then 
   wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz
@@ -10,12 +11,12 @@ fi
 # install ruby
 if [[ ! -f "/usr/bin/ruby2.4" ]]; then 
   sudo apt-add-repository -y ppa:brightbox/ruby-ng
-  sudo apt update
-  sudo apt install -y ruby2.4 ruby2.4-dev
+  sudo apt-get update
+  sudo apt-get install -y ruby2.4 ruby2.4-dev
 fi
 
 # start ipfs
-if ! pgrep -x "ipfs" > /dev/null; then
+if [[ ! -d "/root/.ipfs" ]]; then 
   ipfs init
 fi
 
