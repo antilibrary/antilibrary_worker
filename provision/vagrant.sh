@@ -1,5 +1,11 @@
 # install ipfs
-if [ ! -d /home/vagrant/go-ipfs ]; then wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz &&  tar xzvf go-ipfs_v0.4.10_linux-amd64.tar.gz && rm go-ipfs_v0.4.10_linux-amd64.tar.gz; fi
+if [[ ! -f "/usr/bin/ipfs" ]]; then 
+  wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz
+  tar xzvf go-ipfs_v0.4.10_linux-amd64.tar.gz
+  rm go-ipfs_v0.4.10_linux-amd64.tar.gz
+  sudo mv go-ipfs/ipfs /usr/bin
+  sudo chmod a+x /usr/bin/ipfs
+fi
 
 # install ruby
 if [[ ! -f "/usr/bin/ruby2.4" ]]; then 
@@ -9,13 +15,13 @@ if [[ ! -f "/usr/bin/ruby2.4" ]]; then
 fi
 
 # start ipfs
-/home/vagrant/go-ipfs/ipfs init
+ipfs init
 
 # replace max ipfs storage with user defined value
 sed -i "s/10GB/$(grep 'storage_limit:' config.yml | tail -n1 | awk '{ print $2}')GB/g" ~/.ipfs/config
 
 # run guest daemon
-nohup /home/vagrant/go-ipfs/ipfs daemon &
+nohup ipfs daemon &
 sleep 10
 
 # get host ipfs daemon ip
