@@ -15,7 +15,9 @@ if [[ ! -f "/usr/bin/ruby2.4" ]]; then
 fi
 
 # start ipfs
-ipfs init
+if ! pgrep -x "ipfs" > /dev/null; then
+  ipfs init
+fi
 
 # replace max ipfs storage with user defined value
 sed -i "s/10GB/$(grep 'storage_limit:' config.yml | tail -n1 | awk '{ print $2}')GB/g" ~/.ipfs/config
