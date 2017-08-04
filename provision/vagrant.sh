@@ -23,8 +23,13 @@ fi
 sed -i "s/10GB/$(grep 'storage_limit:' config.yml | tail -n1 | awk '{ print $2}')GB/g" ~/.ipfs/config
 
 # run guest daemon
-nohup ipfs daemon &
-sleep 10
+if ! curl --silent localhost:5001 > /dev/null; then
+  nohup ipfs daemon &
+fi
+
+while ! curl --silent localhost:5001 > /dev/null; do
+  sleep 1
+done
 
 # get host ipfs daemon ip
 export ipfs_api_addr=$(netstat -rn | grep "^0.0.0.0 " | cut -d " " -f10)
