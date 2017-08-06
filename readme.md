@@ -15,7 +15,29 @@ If you're using a VPN, your ip will be hidden from the IPFS network.
 
 By running the script inside the isolated VM and hiding your ip from the IPFS network, you will be as safe as I am (famous last words :) )
 
-### Install and Run
+### Ubuntu install and run
+
+- [Download and unzip this repository](https://github.com/antilibrary/antilibrary_worker/archive/master.zip)
+- Open a terminal, browse to the unzipped folder and run: `bash provision/ubuntu_host.sh`
+- During the setup you will be asked to run this command from another terminal: `./provision/pubsub.sh`
+- Once everything is finished you should see something like:
+
+```
+==> default: #######################################################################
+==> default:
+==> default: Running Antilibrary Worker
+==> default:
+==> default: Starting Antilibrary worker with the following settings (Make sure you've sent me this information - /u/antilibrary):
+==> default:   Node nickname: [YOUR_NODE_NICKNAME]
+==> default:   Node ID: QmTwW5PyA8VaUY4cmjvcLqWTa8y3JPiuErKVoHPjBMRB4s
+==> default:   Secret keyword: [SECRET_KEYWORD_YOU_DEFINED]
+==> default:
+==> default: Listening on: QmTwW5PyA8VaUY4cmjvcLqWTa8y3JPiuErKVoHPjBMRB4ssecretkeyword (keep this secret)
+```
+
+- This means your node is listening, now you need to send me your `Node nickname`, `Node ID` and `Secret keyword` so I can whitelist it on the tracker. Send this to [/u/antilibrary](https://www.reddit.com/user/antilibrary/) or antilibrary@protonmail.com
+
+### Windows/Linux/Other install and Run
 
 - [Download and install Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - [Download and unzip IPFS](https://ipfs.io/docs/install/) (>=0.4.10)

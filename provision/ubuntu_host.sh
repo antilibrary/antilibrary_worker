@@ -1,10 +1,28 @@
 #!/bin/bash
+
+# install base packages
 sudo apt-get update
-sudo apt-get install -y tar
-sudo apt-get install -y wget
-sudo apt-get install -y screen
-sudo apt-get install -y virtualbox
-sudo apt-get install -y vagrant
+sudo apt-get install -y tar wget screen lsb-release
+
+# install virtualbox
+if [[ ! -f "/usr/bin/virtualbox" ]]; then 
+	# add virtualbox repo
+	codename=`lsb_release --codename | cut -f2`
+	if ! grep "deb http://download.virtualbox.org/virtualbox/debian $codename contrib" /etc/apt/sources.list
+	then
+		sudo /bin/sh -c 'codename=`lsb_release --codename | cut -f2` && echo "deb http://download.virtualbox.org/virtualbox/debian $codename contrib" >> /etc/apt/sources.list'
+		sudo wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+		sudo wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+	fi
+
+	sudo apt-get update
+	sudo apt-get install -y dkms virtualbox-4.3
+fi
+
+# install vagrant
+sudo wget "https://releases.hashicorp.com/vagrant/1.9.7/vagrant_1.9.7_$(uname -m).deb"
+sudo dpkg -i "vagrant_1.9.7_$(uname -m).deb"
+sudo rm "vagrant_1.9.7_$(uname -m).deb"
 
 # ipfs
 if [[ ! -f "/usr/bin/ipfs" ]]; then 
@@ -16,18 +34,20 @@ if [[ ! -f "/usr/bin/ipfs" ]]; then
 fi
 
 # pubsub
-chmod a+x pubsub.sh
+chmod a+x provision/pubsub.sh
 if ! screen -list | grep -q "pubsub"; then
-	read -p "Run 'pubsub.sh' in another terminal and then press enter to continue: "
+	read -p "Run './provision/pubsub.sh' in another terminal and then press enter to continue: "
 fi
 
 if ! screen -list | grep -q "pubsub"; then
-	echo "pubsub initiation failed, exiting"
+	echo "Pubsub listener initiation failed, exiting."
 	exit
+else
+	echo "Pubsub listener is running. You can view the logs with 'screen -x pubsub'. Use CTRL-A CTLR-D to exist the logs."
+	echo "If you stop the IPFS listener, the antilibrary worker will not work. ;)"
 fi
 
 # vagrant
-cd ..
 if vagrant global-status | grep antilibrary_worker | grep running > /dev/null; then
 	echo "Worker is up, running 'vagrant provision'"
 	vagrant provision

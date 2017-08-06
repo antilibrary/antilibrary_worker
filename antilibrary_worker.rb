@@ -129,11 +129,11 @@ puts "Listening on: #{@worker_id}#{SECRET_KEYWORD} (keep this secret)"
 
 # get space currently used
 print "Getting local ipfs repo stat (this may take a while)..."
-stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} repo stat")
+stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --enc=json repo stat")
 if !status.success?
   restart_local_daemon
 else
-  @local_space_used = stdout.split(/\n/)[1].split(' ').last.strip.to_i
+  @local_space_used = JSON.parse(stdout)['RepoSize']
 end
 puts "[DONE]"
 
@@ -256,7 +256,7 @@ def message_tracker(message)
 end
 
 def execute_ipfs_command(command, verbose=true)
-  print "running: ipfs #{command.split(' ')[0, 2].join(' ')} > " if verbose
+  print "ipfs #{command.split(' ')[0, 2].join(' ')} > " if verbose
   stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --enc=json #{command}")
 
   if !status.success?
@@ -275,7 +275,7 @@ loop {
     listener
   rescue => e
 
-    if e.to_s.include?('Failed to open TCP connection to localhost:5001')
+    if e.to_s.include?('Failed to open TCP connection to localhost:5001') or e.to_s.include?('Error: api not running')
       restart_local_daemon
 
     elsif e.to_s.include?("Failed to open TCP connection to #{ENV['ipfs_api_addr']}:5001")
