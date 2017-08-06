@@ -13,4 +13,4 @@ secret_keyword: MyVerYSecreTkeyWORD
 # Windows example: 
 # ipfs_bin_path = 'C:/go-ipfs/ipfs.exe'
 # Linux example (default if you're using the vagrant box):
-ipfs_bin_path: '/home/vagrant/go-ipfs/ipfs'
+ipfs_bin_path: '/usr/bin/ipfs'
