@@ -3,7 +3,7 @@
 # Antilibrary Worker
 # Latest version of this client on https://github.com/antilibrary/antilibrary_worker
 
-#require 'pry'
+require 'pry' if ENV['environment'] == 'dev'
 require 'open3'
 require 'net/http'
 require 'json'
@@ -12,8 +12,16 @@ require 'fileutils'
 require 'optparse'
 require 'yaml'
 
-VERSION = '0.3'
+VERSION = '0.4'
 TRACKER_ID = 'QmfYZKUBCrHhLfE5mrG48hQ2wHGSNKzRfS4QoaCFhbWYCf'
+
+
+# If script is being used outside the vagrant box set daemon ip to localhost
+if ENV['ipfs_api_addr'].nil?
+  @ipfs_api_addr = '127.0.0.1'
+else
+  @ipfs_api_addr = ENV['ipfs_api_addr']
+end 
 
 def create_config
   # create new config file
@@ -82,7 +90,7 @@ if !File.exist?(@config['ipfs_bin_path'])
 end
 
 # check if daemon is running with pubsub enabled 
-stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{ENV['ipfs_api_addr']}/tcp/5001 pubsub pub test test")
+stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{@ipfs_api_addr}/tcp/5001 pubsub pub test test")
 if !status.success?
   warn "Error - IPFS pubsub not enabled"
   if stdeerr.include?("Error: experimental pubsub feature not enabled.")
@@ -112,7 +120,7 @@ SECRET_KEYWORD = @config['secret_keyword']
 
 
 # get worker ipfs id
-stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{ENV['ipfs_api_addr']}/tcp/5001 id")
+stdout, stdeerr, status = Open3.capture3("#{@config['ipfs_bin_path']} --api /ip4/#{@ipfs_api_addr}/tcp/5001 id")
 if !status.success?
   unhandled_exception(stdeerr)
 end
@@ -139,7 +147,7 @@ puts "[DONE]"
 
 def listener
   send_joining
-  uri = URI(URI.encode("http://#{ENV['ipfs_api_addr']}:5001/api/v0/pubsub/sub?arg=#{@worker_id}#{SECRET_KEYWORD}"))
+  uri = URI(URI.encode("http://#{@ipfs_api_addr}:5001/api/v0/pubsub/sub?arg=#{@worker_id}#{SECRET_KEYWORD}"))
   Net::HTTP.start(uri.host, uri.port) do |http|
     @http = http
     @http.read_timeout = 120
@@ -161,7 +169,8 @@ def listener
           new_message['command'] = command
           new_message['ipfs_hash'] = ipfs_hash
           new_message['local_space_used'] = @local_space_used
-
+          new_message['storage_limit'] = @local_space_limit
+          new_message['version'] = VERSION
 
           case command
 
@@ -242,13 +251,15 @@ def send_joining
   new_message['command'] = 'joining'
   new_message['storage_limit'] = @local_space_limit
   new_message['local_space_used'] = @local_space_used
+  new_message['version'] = VERSION
+  
   message_tracker(new_message)
   puts "[DONE]"
 end
 
 def message_tracker(message)
   message_json = JSON.generate(message)
-  uri = URI(URI.encode("http://#{ENV['ipfs_api_addr']}:5001/api/v0/pubsub/pub?arg=#{TRACKER_ID}&arg=#{message_json}"))
+  uri = URI(URI.encode("http://#{@ipfs_api_addr}:5001/api/v0/pubsub/pub?arg=#{TRACKER_ID}&arg=#{message_json}"))
   Net::HTTP.start(uri.host, uri.port) do |http|
     request = Net::HTTP::Get.new uri
     http.request request
@@ -278,7 +289,7 @@ loop {
     if e.to_s.include?('Failed to open TCP connection to localhost:5001') or e.to_s.include?('Error: api not running')
       restart_local_daemon
 
-    elsif e.to_s.include?("Failed to open TCP connection to #{ENV['ipfs_api_addr']}:5001")
+    elsif e.to_s.include?("Failed to open TCP connection to #{@ipfs_api_addr}:5001")
       warn " "
       warn "#################################################"
       warn "ERROR - IPFS Daemon is not running in the host machine"
